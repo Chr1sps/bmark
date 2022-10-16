@@ -11,26 +11,30 @@ def func2():
 
 def test_defaults():
     assert Bmark.get_measured_time() is None
-    assert Bmark.get_acc_time() == 0
-    assert len(Bmark.get_all_acc_times()) == 0
+    assert Bmark.get_func_times(func) is None
 
 
 def test_measure_time():
     Bmark.measure_time(func)()
     assert Bmark.get_measured_time() is not None
-    assert Bmark.get_acc_time() == 0
-    assert len(Bmark.get_all_acc_times()) == 0
+    assert Bmark.get_func_times(func) is None
 
 
-def test_acc_total():
-    Bmark.accumulate_to_total_time(func)()
-    assert Bmark.get_measured_time() is None
-    assert Bmark.get_acc_time() != 0
-    assert len(Bmark.get_all_acc_times()) == 0
+def test_measure_time_accumulate():
+    Bmark.enable_accumulating()
+    Bmark.measure_time(func)()
+    assert Bmark.get_measured_time() is not None
+    assert Bmark.get_func_times(func) is not None
+    assert len(Bmark.get_func_times(func)) == 1
+    assert Bmark.get_func_times(func2) is None
 
 
-def test_acc_total_two_funcs():
-    Bmark.accumulate_to_total_time(func)()
-    temp = Bmark.get_acc_time()
-    Bmark.accumulate_to_total_time(func2)()
-    assert Bmark.get_acc_time() != temp
+def test_measure_time_acc_two_funcs():
+    Bmark.enable_accumulating()
+    Bmark.measure_time(func)()
+    Bmark.measure_time(func2)()
+    assert Bmark.get_measured_time() is not None
+    assert Bmark.get_func_times(func) is not None
+    assert Bmark.get_func_times(func2) is not None
+    assert len(Bmark.get_func_times(func)) == 1
+    assert len(Bmark.get_func_times(func2)) == 1
