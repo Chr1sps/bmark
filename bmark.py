@@ -36,6 +36,7 @@ class Bmark:
     @staticmethod
     def measure_time(func_id: str) -> Callable:
         def decorator(func: Callable) -> Callable:
+            @Bmark._disabled_garbage
             def wrapper(*args, **kwargs):
 
                 start = time.process_time()
@@ -51,22 +52,6 @@ class Bmark:
             return wrapper
 
         return decorator
-
-    # def measure_time(func: Callable, func_id: str) -> Callable:
-    #     @Bmark._disabled_garbage
-    #     def wrapper(*args, **kwargs):
-
-    #         start = time.process_time()
-    #         result = func(*args, **kwargs)
-    #         measurement = time.process_time() - start
-
-    #         if Bmark._accumulate:
-    #             Bmark._accumulate_to_dict(func_id, measurement)
-    #         Bmark._last_time = measurement
-
-    #         return result
-
-    #     return wrapper
 
     @staticmethod
     def get_measured_time() -> float | None:
