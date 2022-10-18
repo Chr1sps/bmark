@@ -9,7 +9,7 @@ class Bmark:
     """
 
     _last_time: float | None = None
-    _time_dict: Dict[Callable, List[float]] = {}
+    _time_dict: Dict[str, List[float]] = {}
     _accumulate = False
 
     @staticmethod
@@ -28,13 +28,13 @@ class Bmark:
         return wrapper
 
     @staticmethod
-    def _accumulate_to_dict(func: Callable, measurement: float):
-        if func not in Bmark._time_dict.keys():
-            Bmark._time_dict[func] = []
-        Bmark._time_dict[func].append(measurement)
+    def _accumulate_to_dict(func_id: str, measurement: float):
+        if func_id not in Bmark._time_dict.keys():
+            Bmark._time_dict[func_id] = []
+        Bmark._time_dict[func_id].append(measurement)
 
     @staticmethod
-    def measure_time(func: Callable) -> Callable:
+    def measure_time(func: Callable, func_id: str) -> Callable:
         @Bmark._disabled_garbage
         def wrapper(*args, **kwargs):
 
@@ -43,7 +43,7 @@ class Bmark:
             measurement = time.process_time() - start
 
             if Bmark._accumulate:
-                Bmark._accumulate_to_dict(func, measurement)
+                Bmark._accumulate_to_dict(func_id, measurement)
             Bmark._last_time = measurement
 
             return result
@@ -55,28 +55,28 @@ class Bmark:
         return Bmark._last_time
 
     @staticmethod
-    def get_func_times(func: Callable) -> List[float] | None:
-        if func not in Bmark._time_dict:
+    def get_func_times(func_id: str) -> List[float] | None:
+        if func_id not in Bmark._time_dict:
             return None
-        return Bmark._time_dict[func]
+        return Bmark._time_dict[func_id]
 
     @staticmethod
-    def get_last_func_time(func: Callable) -> float | None:
-        if func not in Bmark._time_dict:
+    def get_last_func_time(func_id: str) -> float | None:
+        if func_id not in Bmark._time_dict:
             return None
-        return Bmark._time_dict[func][-1]
+        return Bmark._time_dict[func_id][-1]
 
     @staticmethod
-    def get_time_sum_func(func: Callable) -> float | None:
-        if func not in Bmark._time_dict.keys():
+    def get_time_sum_func(func_id: str) -> float | None:
+        if func_id not in Bmark._time_dict.keys():
             return None
-        return sum(Bmark._time_dict[func])
+        return sum(Bmark._time_dict[func_id])
 
     @staticmethod
     def get_time_sum_all_funcs() -> float | None:
         result = None
-        for func in Bmark._time_dict.keys():
-            func_time = Bmark.get_time_sum_func(func)
+        for func_id in Bmark._time_dict.keys():
+            func_time = Bmark.get_time_sum_func(func_id)
             if func_time is not None:
                 if result is None:
                     result = 0
@@ -96,9 +96,9 @@ class Bmark:
         Bmark._last_time = None
 
     @staticmethod
-    def delete_func_times(func: Callable):
-        if func in Bmark._time_dict.keys():
-            Bmark._time_dict.pop(func)
+    def delete_func_times(func_id: str):
+        if func_id in Bmark._time_dict.keys():
+            Bmark._time_dict.pop(func_id)
 
     @staticmethod
     def delete_all_func_times():
