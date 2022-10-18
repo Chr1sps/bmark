@@ -13,7 +13,7 @@ class Bmark:
     _accumulate = False
 
     @staticmethod
-    def _disabled_garbage(func):
+    def _disabled_garbage(func: Callable):
         def wrapper(*args, **kwargs):
 
             gc_old = gc.isenabled()
@@ -28,13 +28,13 @@ class Bmark:
         return wrapper
 
     @staticmethod
-    def _accumulate_to_dict(func, measurement):
+    def _accumulate_to_dict(func: Callable, measurement: float):
         if func not in Bmark._time_dict.keys():
             Bmark._time_dict[func] = []
         Bmark._time_dict[func].append(measurement)
 
     @staticmethod
-    def measure_time(func) -> Callable:
+    def measure_time(func: Callable) -> Callable:
         @Bmark._disabled_garbage
         def wrapper(*args, **kwargs):
 
