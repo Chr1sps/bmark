@@ -11,6 +11,15 @@ def func2():
     pass
 
 
+class Cls:
+    def __init__(self):
+        pass
+
+    @Bmark.measure_time("class")
+    def method(self):
+        pass
+
+
 def test_defaults():
     assert Bmark.get_measured_time() is None
     assert Bmark.get_func_times("func") is None
@@ -79,3 +88,12 @@ def test_deleting_all_func_times():
     assert Bmark.get_time_sum_func("func") is None
     assert Bmark.get_time_sum_func("func2") is None
     assert Bmark.get_time_sum_all_funcs() is None
+
+
+def test_class():
+    Bmark.enable_accumulating()
+    cls = Cls()
+    cls.method()
+    assert Bmark.get_func_times("class") is not None
+    assert Bmark.get_time_sum_func("class") is not None
+    assert Bmark.get_time_sum_all_funcs() is not None
