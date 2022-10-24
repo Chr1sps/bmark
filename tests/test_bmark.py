@@ -123,3 +123,24 @@ def test_measure_time_acc_two_ids():
     assert Bmark.get_time_sum_func("func1") is not None
     assert Bmark.get_time_sum_func("func2") is not None
     assert Bmark.get_time_sum_all_funcs() is not None
+
+
+def test_get_multiple_times():
+    Bmark.enable_accumulating()
+    func1()
+    func2()
+    dict = Bmark.get_func_times("func1", "func2")
+    assert "func1" in dict.keys()  # type: ignore
+    assert "func2" in dict.keys()  # type: ignore
+
+
+def test_get_func_times_variadic():
+    Bmark.enable_accumulating()
+    func1()
+    func2()
+    time1, time2, time12 = (
+        Bmark.get_time_sum_func("func1"),
+        Bmark.get_time_sum_func("func2"),
+        Bmark.get_time_sum_func("func1", "func2"),
+    )
+    assert time12 == (time1 + time2)  # type: ignore
