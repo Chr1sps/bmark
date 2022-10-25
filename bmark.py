@@ -110,6 +110,13 @@ class Bmark:
     def get_times_funcs(
         func_id: str, *func_ids: str
     ) -> None | List[float] | Dict[str, None | List[float]]:
+        """
+        If a single function id is given, returns a list of all measurements of
+        the function if exists, ``None`` otherwise. If instead multiple ids are
+        given, returns a dictionary with function ids as keys and similar lists
+        as values (with all measurements of each function accordingly, ``None``
+        if there are no such measurements).
+        """
 
         if len(func_ids) == 0:
             return Bmark._get_func_times(func_id)
@@ -125,6 +132,10 @@ class Bmark:
 
     @staticmethod
     def get_last_func_time(func_id: str) -> float | None:
+        """
+        Returns the last measurement performed on a function (or ``None`` if
+        there are no such measurements).
+        """
 
         if func_id not in Bmark._time_dict:
             return None
@@ -133,6 +144,10 @@ class Bmark:
 
     @staticmethod
     def get_time_sum_funcs(func_id: str, *func_ids: str) -> float | None:
+        """
+        Returns a sum of all measurements of all functions given as parameters
+        (or ``None`` if none of the functions has any measurements).
+        """
 
         result = Bmark._get_time_sum_func(func_id)
 
@@ -149,6 +164,10 @@ class Bmark:
 
     @staticmethod
     def get_time_sum_all_funcs() -> float | None:
+        """
+        Returns a sum of all measurements of all functions (or ``None`` if none
+        of the functions has any measurements).
+        """
 
         if len(Bmark._time_dict) == 0:
             return None
@@ -157,21 +176,39 @@ class Bmark:
 
     @staticmethod
     def enable_accumulating():
+        """Enables storing all performed measurements to an inner dict."""
         Bmark._accumulate = True
 
     @staticmethod
     def disable_accumulating():
+        """Disables storing all performed measurements to an inner dict."""
         Bmark._accumulate = False
 
     @staticmethod
     def reset_measured_time():
+        """
+        Resets last measured time. After this call, ``get_measured_time``
+        will return None.
+        """
         Bmark._last_time = None
 
     @staticmethod
-    def delete_func_times(func_id: str):
+    def _delete_func_times(func_id: str):
+        """Deletes all stored measurements of a given function."""
         if func_id in Bmark._time_dict.keys():
             Bmark._time_dict.pop(func_id)
 
     @staticmethod
+    def delete_func_times(func_id: str, *func_ids: str):
+        """
+        Deletes all stored measurements of all functions given as
+        parameters.
+        """
+        Bmark._delete_func_times(func_id)
+        for id in func_ids:
+            Bmark._delete_func_times(id)
+
+    @staticmethod
     def delete_all_func_times():
+        """Deletes all stored measurements of all functions."""
         Bmark._time_dict.clear()
