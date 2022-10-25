@@ -106,7 +106,7 @@ def test_deleting_all_func_times():
     assert Bmark.get_time_sum_all_funcs() is None
 
 
-def test_class():
+def test_method():
     Bmark.enable_accumulating()
     cls = Cls()
     cls.method()

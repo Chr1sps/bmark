@@ -14,6 +14,10 @@ class Bmark:
 
     @staticmethod
     def _disabled_garbage(func: Callable):
+        """
+        Disables garbage collecting during measuring a given function.
+        """
+
         def wrapper(*args, **kwargs):
 
             gc_old = gc.isenabled()
@@ -30,7 +34,9 @@ class Bmark:
 
     @staticmethod
     def _accumulate_to_dict(func_id: str, measurement: float):
-
+        """
+        Appends given measurement to a list under the func_id key.
+        """
         if func_id not in Bmark._time_dict.keys():
             Bmark._time_dict[func_id] = []
 
@@ -38,7 +44,10 @@ class Bmark:
 
     @staticmethod
     def _get_func_times(func_id: str) -> List[float] | None:
-
+        """
+        Returns a list of all measured function times if they exist, None
+        otherwise.
+        """
         if func_id not in Bmark._time_dict:
             return None
 
@@ -46,7 +55,10 @@ class Bmark:
 
     @staticmethod
     def _get_time_sum_func(func_id: str) -> float | None:
-
+        """
+        Returns a sum of all measurements of a given function if they exist,
+        None otherwise.
+        """
         if func_id not in Bmark._time_dict:
             return None
 
@@ -54,6 +66,19 @@ class Bmark:
 
     @staticmethod
     def measure_time(*func_ids: str) -> Callable:
+        """
+        Time measurement decorator.
+
+        Whenever the decorated function (or method) is called the decorator
+        measures the time is takes to finish it. This decorator temporarily
+        disables garbage collecting in order to get correct measurements.
+
+        This decorator can have specified function ids as arguments. This will
+        make the class associate all the measurements with the given ids
+        (provided ``Bmark.enable_accumulating()`` has been called
+        beforehand).
+        """
+
         def decorator(func: Callable) -> Callable:
             @Bmark._disabled_garbage
             def wrapper(*args, **kwargs):
@@ -75,6 +100,10 @@ class Bmark:
 
     @staticmethod
     def get_measured_time() -> float | None:
+        """
+        Returns the last measurement (``None`` if there was none or if
+        ``Bmark.reset_measured_time()`` has been invoked).
+        """
         return Bmark._last_time
 
     @staticmethod
