@@ -201,6 +201,10 @@ def reset_all_func_times():
 
 
 def reset_to_default():
+    """
+    Resets the module to default state (no measurements, disabled
+    accumulating).
+    """
     reset_all_func_times()
     reset_measured_time()
     disable_accumulating()
