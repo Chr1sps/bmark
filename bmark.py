@@ -1,6 +1,6 @@
 import gc
 import time
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 
 class Bmark:
@@ -8,14 +8,14 @@ class Bmark:
     A collection of benchmark functions useful in data science applications
     """
 
-    _last_time: float | None = None
+    _last_time: Optional[float] = None
     _time_dict: Dict[str, List[float]] = {}
     _accumulate = False
 
     @staticmethod
     def _disabled_garbage(func: Callable):
         """
-        Disables garbage collecting during measuring a given function.
+        Disables garbage collecting when measuring a given function.
         """
 
         def wrapper(*args, **kwargs):
@@ -43,7 +43,7 @@ class Bmark:
         Bmark._time_dict[func_id].append(measurement)
 
     @staticmethod
-    def _get_func_times(func_id: str) -> List[float] | None:
+    def _get_func_times(func_id: str) -> Optional[List[float]]:
         """
         Returns a list of all measured function times if they exist, None
         otherwise.
@@ -54,7 +54,7 @@ class Bmark:
         return Bmark._time_dict[func_id]
 
     @staticmethod
-    def _get_time_sum_func(func_id: str) -> float | None:
+    def _get_time_sum_func(func_id: str) -> Optional[float]:
         """
         Returns a sum of all measurements of a given function if they exist,
         None otherwise.
@@ -99,7 +99,7 @@ class Bmark:
         return decorator
 
     @staticmethod
-    def get_measured_time() -> float | None:
+    def get_measured_time() -> Optional[float]:
         """
         Returns the last measurement (``None`` if there was none or if
         ``Bmark.reset_measured_time()`` has been invoked).
@@ -131,7 +131,7 @@ class Bmark:
             return result
 
     @staticmethod
-    def get_last_func_time(func_id: str) -> float | None:
+    def get_last_func_time(func_id: str) -> Optional[float]:
         """
         Returns the last measurement performed on a function (or ``None`` if
         there are no such measurements).
@@ -143,7 +143,7 @@ class Bmark:
         return Bmark._time_dict[func_id][-1]
 
     @staticmethod
-    def get_time_sum_funcs(func_id: str, *func_ids: str) -> float | None:
+    def get_time_sum_funcs(func_id: str, *func_ids: str) -> Optional[float]:
         """
         Returns a sum of all measurements of all functions given as parameters
         (or ``None`` if none of the functions has any measurements).
@@ -175,7 +175,7 @@ class Bmark:
         return result
 
     @staticmethod
-    def get_time_sum_all_funcs() -> float | None:
+    def get_time_sum_all_funcs() -> Optional[float]:
         """
         Returns a sum of all measurements of all functions (or ``None`` if none
         of the functions has any measurements).
