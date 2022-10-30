@@ -1,3 +1,4 @@
+import pytest
 from bmark import Bmark
 
 
@@ -19,6 +20,11 @@ def func2():
 @Bmark.measure_time("func1", "func2")
 def func12():
     pass
+
+
+@pytest.fixture(autouse=True)
+def reset_bmark():
+    Bmark.reset_to_default()
 
 
 class Cls:
@@ -87,7 +93,7 @@ def test_deleting_func_times():
     Bmark.enable_accumulating()
     func1()
     func2()
-    Bmark.delete_func_times("func1")
+    Bmark.reset_func_times("func1")
     assert Bmark.get_times_funcs("func1") is None
     assert Bmark.get_times_funcs("func2") is not None
     assert Bmark.get_time_sum_funcs("func1") is None
@@ -98,7 +104,7 @@ def test_deleting_all_func_times():
     Bmark.enable_accumulating()
     func1()
     func2()
-    Bmark.delete_all_func_times()
+    Bmark.reset_all_func_times()
     assert Bmark.get_times_funcs("func1") is None
     assert Bmark.get_times_funcs("func2") is None
     assert Bmark.get_time_sum_funcs("func1") is None
@@ -134,7 +140,7 @@ def test_get_multiple_times():
     assert "func2" in dict.keys()  # type: ignore
 
 
-def test_get_times_funcs_variadic():
+def test_get_time_sum_funcs_variadic():
     Bmark.enable_accumulating()
     func1()
     func2()
@@ -144,3 +150,12 @@ def test_get_times_funcs_variadic():
         Bmark.get_time_sum_funcs("func1", "func2"),
     )
     assert time12 == (time1 + time2)  # type: ignore
+
+
+def test_get_time_sum_funcs_variadic_repeats():
+    Bmark.enable_accumulating()
+    func1()
+    func2()
+    time1 = Bmark.get_time_sum_funcs("func1")
+    time11 = Bmark.get_time_sum_funcs("func1", "func1")
+    assert time1 == time11

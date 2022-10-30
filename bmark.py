@@ -149,17 +149,29 @@ class Bmark:
         (or ``None`` if none of the functions has any measurements).
         """
 
+        Bmark._remaining_ids = list(Bmark._time_dict.keys())
         result = Bmark._get_time_sum_func(func_id)
+
+        try:
+            Bmark._remaining_ids.remove(func_id)
+        except ValueError:
+            result = None
 
         for id in func_ids:
 
             func_time = Bmark._get_time_sum_func(id)
+
+            try:
+                Bmark._remaining_ids.remove(id)
+            except ValueError:
+                func_time = None
 
             if func_time is not None:
                 if result is None:
                     result = 0
                 result += func_time
 
+        del Bmark._remaining_ids
         return result
 
     @staticmethod
@@ -193,22 +205,28 @@ class Bmark:
         Bmark._last_time = None
 
     @staticmethod
-    def _delete_func_times(func_id: str):
-        """Deletes all stored measurements of a given function."""
+    def _reset_func_times(func_id: str):
+        """Resets all stored measurements of a given function."""
         if func_id in Bmark._time_dict.keys():
             Bmark._time_dict.pop(func_id)
 
     @staticmethod
-    def delete_func_times(func_id: str, *func_ids: str):
+    def reset_func_times(func_id: str, *func_ids: str):
         """
-        Deletes all stored measurements of all functions given as
+        Resets all stored measurements of all functions given as
         parameters.
         """
-        Bmark._delete_func_times(func_id)
+        Bmark._reset_func_times(func_id)
         for id in func_ids:
-            Bmark._delete_func_times(id)
+            Bmark._reset_func_times(id)
 
     @staticmethod
-    def delete_all_func_times():
-        """Deletes all stored measurements of all functions."""
+    def reset_all_func_times():
+        """Resets all stored measurements of all functions."""
         Bmark._time_dict.clear()
+
+    @staticmethod
+    def reset_to_default():
+        Bmark.reset_all_func_times()
+        Bmark.reset_measured_time()
+        Bmark.disable_accumulating()
