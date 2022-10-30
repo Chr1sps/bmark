@@ -1,10 +1,10 @@
+"""
+A collection of benchmark functions useful in data science applications
+"""
 import gc
 import time
 from typing import Callable, Dict, List, Optional
 
-"""
-A collection of benchmark functions useful in data science applications
-"""
 __last_time: Optional[float] = None
 __time_dict: Dict[str, List[float]] = {}
 __accumulate = False
