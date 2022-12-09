@@ -1,13 +1,14 @@
 """
 A collection of benchmark functions useful in data science applications
 """
+import contextlib
 import gc
 import time
 from typing import Callable, Dict, List, Optional
 
 __last_time: Optional[float] = None
 __time_dict: Dict[str, List[float]] = {}
-__accumulate = False
+__accumulate: bool = False
 
 
 def __disabled_garbage(func: Callable):
@@ -208,3 +209,21 @@ def reset_to_default():
     reset_all_func_times()
     reset_measured_time()
     disable_accumulating()
+
+
+@contextlib.contextmanager
+@__disabled_garbage
+def measure_block(*func_ids: str):
+    """
+    Context manager equivalent for the bmark.measure_time decorator.
+    """
+    start = time.process_time()
+    try:
+        yield
+    finally:
+        measurement = time.process_time() - start
+        global __last_time, __accumulate
+        __last_time = measurement
+        if __accumulate:
+            for func_id in func_ids:
+                __accumulate_to_dict(func_id, measurement)

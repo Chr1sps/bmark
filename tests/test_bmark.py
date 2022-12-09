@@ -1,5 +1,6 @@
-import bmark
 import pytest
+
+import bmark
 
 
 @bmark.measure_time()
@@ -25,6 +26,10 @@ def func12():
 @pytest.fixture(autouse=True)
 def reset_bmark():
     bmark.reset_to_default()
+
+
+def dummy():
+    pass
 
 
 class Cls:
@@ -159,3 +164,10 @@ def test_get_time_sum_funcs_variadic_repeats():
     time1 = bmark.get_time_sum_funcs("func1")
     time11 = bmark.get_time_sum_funcs("func1", "func1")
     assert time1 == time11
+
+
+def test_measure_block():
+    with bmark.measure_block("func1"):
+        dummy()
+    assert bmark.get_measured_time() is not None
+    assert bmark.get_times_funcs("func1") is None
