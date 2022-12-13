@@ -1,3 +1,5 @@
+import gc
+
 import pytest
 
 import bmark
@@ -32,6 +34,11 @@ def dummy():
     pass
 
 
+@bmark.measure_time()
+def gc_check():
+    return gc.isenabled()
+
+
 class Cls:
     def __init__(self):
         pass
@@ -53,7 +60,7 @@ def test_measure_time():
 
 
 def test_measure_time_accumulate():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     assert bmark.get_measured_time() is not None
     assert bmark.get_times_funcs("func1") is not None
@@ -62,7 +69,7 @@ def test_measure_time_accumulate():
 
 
 def test_measure_time_acc_two_funcs():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     assert bmark.get_measured_time() is not None
@@ -73,7 +80,7 @@ def test_measure_time_acc_two_funcs():
 
 
 def test_measure_time_acc_two_funcs_sum():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     time1 = bmark.get_time_sum_funcs("func1")
@@ -83,7 +90,7 @@ def test_measure_time_acc_two_funcs_sum():
 
 
 def test_measure_time_acc_no_id():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func()
     assert bmark.get_time_sum_all_funcs() is None
 
@@ -95,7 +102,7 @@ def test_time_reset():
 
 
 def test_deleting_func_times():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     bmark.reset_func_times("func1")
@@ -106,7 +113,7 @@ def test_deleting_func_times():
 
 
 def test_deleting_all_func_times():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     bmark.reset_all_func_times()
@@ -118,7 +125,7 @@ def test_deleting_all_func_times():
 
 
 def test_method():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     cls = Cls()
     cls.method()
     assert bmark.get_times_funcs("class") is not None
@@ -127,7 +134,7 @@ def test_method():
 
 
 def test_measure_time_acc_two_ids():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func12()
     assert bmark.get_times_funcs("func1") is not None
     assert bmark.get_times_funcs("func2") is not None
@@ -137,7 +144,7 @@ def test_measure_time_acc_two_ids():
 
 
 def test_get_multiple_times():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     dict = bmark.get_times_funcs("func1", "func2")
@@ -146,7 +153,7 @@ def test_get_multiple_times():
 
 
 def test_get_time_sum_funcs_variadic():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     time1, time2, time12 = (
@@ -158,7 +165,7 @@ def test_get_time_sum_funcs_variadic():
 
 
 def test_get_time_sum_funcs_variadic_repeats():
-    bmark.enable_accumulating()
+    bmark.set_accumulating(True)
     func1()
     func2()
     time1 = bmark.get_time_sum_funcs("func1")
@@ -171,3 +178,10 @@ def test_measure_block():
         dummy()
     assert bmark.get_measured_time() is not None
     assert bmark.get_times_funcs("func1") is None
+
+
+def test_not_disabling_gc():
+    gc.enable()
+    bmark.set_disabled_gc(False)
+    result = gc_check()
+    assert result

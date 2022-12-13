@@ -9,6 +9,7 @@ from typing import Callable, Dict, List, Optional
 __last_time: Optional[float] = None
 __time_dict: Dict[str, List[float]] = {}
 __accumulate: bool = False
+__gc_disabled: bool = True
 
 
 def __disabled_garbage(func: Callable):
@@ -17,11 +18,14 @@ def __disabled_garbage(func: Callable):
     """
 
     def wrapper(*args, **kwargs):
-        gc_old = gc.isenabled()
-        gc.disable()
+        gc_old = None  # silence unbound warning
+        if __gc_disabled:
+            gc_old = gc.isenabled()
+            gc.disable()
         result = func(*args, **kwargs)
-        if gc_old:
-            gc.enable()
+        if __gc_disabled:
+            if gc_old:
+                gc.enable()
         return result
 
     return wrapper
@@ -159,16 +163,14 @@ def get_time_sum_all_funcs() -> Optional[float]:
     return get_time_sum_funcs(*__time_dict.keys())
 
 
-def enable_accumulating():
-    """Enables storing all performed measurements to an inner dict."""
+def set_accumulating(do_acc: bool):
     global __accumulate
-    __accumulate = True
+    __accumulate = do_acc
 
 
-def disable_accumulating():
-    """Disables storing all performed measurements to an inner dict."""
-    global __accumulate
-    __accumulate = False
+def set_disabled_gc(disabled: bool):
+    global __gc_disabled
+    __gc_disabled = disabled
 
 
 def reset_measured_time():
@@ -208,7 +210,7 @@ def reset_to_default():
     """
     reset_all_func_times()
     reset_measured_time()
-    disable_accumulating()
+    set_accumulating(False)
 
 
 @contextlib.contextmanager
