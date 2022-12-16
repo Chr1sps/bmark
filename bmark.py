@@ -6,6 +6,8 @@ import gc
 import time
 from typing import Callable, Dict, List, Optional
 
+import numpy
+
 __last_time: Optional[float] = None
 __time_dict: Dict[str, List[float]] = {}
 __accumulate: bool = False
@@ -229,3 +231,14 @@ def measure_block(*func_ids: str):
         if __accumulate:
             for func_id in func_ids:
                 __accumulate_to_dict(func_id, measurement)
+
+
+def get_percentile(
+    func_id: str, percentile: float, interpolate: bool = False
+) -> float:
+    method = "lower"
+    if interpolate:
+        method = "linear"
+    return numpy.percentile(
+        __time_dict[func_id], percentile, method=method
+    )  # type: ignore

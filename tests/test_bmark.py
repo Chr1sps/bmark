@@ -185,3 +185,20 @@ def test_not_disabling_gc():
     bmark.set_disabled_gc(False)
     result = gc_check()
     assert result
+
+
+def test_percentile_no_interpolation(monkeypatch):
+    test_dict = {"func": [1, 2, 3, 4, 5]}
+    monkeypatch.setattr(bmark, "__time_dict", test_dict)
+    assert bmark.get_percentile("func", 0) == 1
+    assert bmark.get_percentile("func", 25) == 2
+    assert bmark.get_percentile("func", 80) == 4
+
+
+def test_percentile_with_interpolation(monkeypatch):
+    test_dict = {"func": [1, 2, 3, 4, 5]}
+    monkeypatch.setattr(bmark, "__time_dict", test_dict)
+    assert bmark.get_percentile("func", 0, True) == 1
+    assert bmark.get_percentile("func", 25, True) == 2
+    assert bmark.get_percentile("func", 60, True) == 3.4
+    assert bmark.get_percentile("func", 80, True) == 4.2
