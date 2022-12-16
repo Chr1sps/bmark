@@ -244,9 +244,13 @@ def get_percentile(
     )  # type: ignore
 
 
-def get_average(func_id: str):
-    return np.average(__time_dict[func_id])
+def get_average(func_id: str) -> float:
+    return np.average(__time_dict[func_id])  # type: ignore
 
 
-def get_median(func_id: str):
-    return np.median(__time_dict[func_id])
+def get_median(func_id: str) -> float:
+    return np.median(__time_dict[func_id])  # type: ignore
+
+
+def get_std_dev(func_id: str) -> float:
+    return np.std(__time_dict[func_id])  # type: ignore

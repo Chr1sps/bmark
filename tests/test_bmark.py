@@ -212,3 +212,7 @@ def test_median(mock_time_dict):
 
 def test_average(mock_time_dict):
     assert bmark.get_average("func") == 4.5
+
+
+def test_std_dev(mock_time_dict):
+    assert bmark.get_std_dev("func") == pytest.approx(2.2173557826)
