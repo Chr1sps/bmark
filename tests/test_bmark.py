@@ -39,6 +39,12 @@ def gc_check():
     return gc.isenabled()
 
 
+@pytest.fixture
+def mock_time_dict(monkeypatch):
+    test_dict = {"func": [7, 5, 6, 6, 1, 2]}
+    monkeypatch.setattr(bmark, "__time_dict", test_dict)
+
+
 class Cls:
     def __init__(self):
         pass
@@ -187,18 +193,22 @@ def test_not_disabling_gc():
     assert result
 
 
-def test_percentile_no_interpolation(monkeypatch):
-    test_dict = {"func": [1, 2, 3, 4, 5]}
-    monkeypatch.setattr(bmark, "__time_dict", test_dict)
+def test_percentile_no_interpolation(mock_time_dict):
     assert bmark.get_percentile("func", 0) == 1
     assert bmark.get_percentile("func", 25) == 2
-    assert bmark.get_percentile("func", 80) == 4
+    assert bmark.get_percentile("func", 80) == 6
 
 
-def test_percentile_with_interpolation(monkeypatch):
-    test_dict = {"func": [1, 2, 3, 4, 5]}
-    monkeypatch.setattr(bmark, "__time_dict", test_dict)
+def test_percentile_with_interpolation(mock_time_dict):
     assert bmark.get_percentile("func", 0, True) == 1
-    assert bmark.get_percentile("func", 25, True) == 2
-    assert bmark.get_percentile("func", 60, True) == 3.4
-    assert bmark.get_percentile("func", 80, True) == 4.2
+    assert bmark.get_percentile("func", 25, True) == 2.75
+    assert bmark.get_percentile("func", 55, True) == 5.75
+    assert bmark.get_percentile("func", 80, True) == 6
+
+
+def test_median(mock_time_dict):
+    assert bmark.get_median("func") == 5.5
+
+
+def test_average(mock_time_dict):
+    assert bmark.get_average("func") == 4.5

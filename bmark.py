@@ -6,7 +6,7 @@ import gc
 import time
 from typing import Callable, Dict, List, Optional
 
-import numpy
+import numpy as np
 
 __last_time: Optional[float] = None
 __time_dict: Dict[str, List[float]] = {}
@@ -239,6 +239,14 @@ def get_percentile(
     method = "lower"
     if interpolate:
         method = "linear"
-    return numpy.percentile(
+    return np.percentile(
         __time_dict[func_id], percentile, method=method
     )  # type: ignore
+
+
+def get_average(func_id: str):
+    return np.average(__time_dict[func_id])
+
+
+def get_median(func_id: str):
+    return np.median(__time_dict[func_id])
