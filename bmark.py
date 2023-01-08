@@ -5,7 +5,7 @@ A collection of benchmark functions useful in data science applications
 """
 import gc
 import time
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, overload
 
 import numpy as np
 
@@ -191,6 +191,16 @@ def get_last_time(func_id: Optional[str] = None) -> Optional[float]:
         if func_id not in _time_dict:
             return None
         return _time_dict[func_id][-1]
+
+
+@overload
+def get_times(func_id: str) -> None | List[float]:
+    ...
+
+
+@overload
+def get_times(func_id: str, *func_ids: str) -> Dict[str, None | List[float]]:
+    ...
 
 
 def get_times(
